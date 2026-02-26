@@ -185,7 +185,7 @@ This quantifies:
 
 ## Dashboard Overview
 
-https://github.com/Neelaksh-Lohani/Inventory_Reorder_Policy_Optimization/blob/main/Project_Relevant_Photos/Dashboard.png
+![Dashboard Overview](https://github.com/Neelaksh-Lohani/Inventory_Reorder_Policy_Optimization/raw/main/Project_Relevant_Photos/Dashboard.png)
 
 The Power BI dashboard provides:
 
@@ -202,7 +202,7 @@ The Power BI dashboard provides:
 
 ## Data Model
 
-https://github.com/Neelaksh-Lohani/Inventory_Reorder_Policy_Optimization/blob/main/Project_Relevant_Photos/Data_Model.png
+![Data Model](https://github.com/Neelaksh-Lohani/Inventory_Reorder_Policy_Optimization/raw/main/Project_Relevant_Photos/Data_Model.png)
 
 The analytical model integrates:
 
