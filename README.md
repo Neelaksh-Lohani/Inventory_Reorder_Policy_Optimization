@@ -1,10 +1,22 @@
 # Inventory Reorder Policy Evaluation
 
-### Assessing Replenishment Policy Adequacy under Demand & Lead Time Variability
+### Replenishment Adequacy under Demand & Lead Time Variability
 
 ---
 
-## Project Overview
+# Executive Summary
+
+* **118 SKUs analyzed** across 180K+ transactional records
+* **77% of SKUs classified as demand-volatile**
+* **Avg reorder gap: 10.48 units** under current policy
+* **$185.9K incremental working capital required** to align with 95% service target
+* Capital exposure concentrated in high-variability SKUs
+
+This project evaluates whether the current replenishment policy can sustain a **95% service level** under operational uncertainty — and quantifies the capital required to correct policy gaps.
+
+---
+
+# Business Context
 
 Inventory replenishment decisions are commonly based on:
 
@@ -12,308 +24,263 @@ Inventory replenishment decisions are commonly based on:
 * Fixed supplier lead times
 * Static Min–Max reorder policies
 
-These planning approaches assume:
+These assumptions imply stable demand and supply conditions.
 
-> Stable demand and supply conditions
+In reality:
 
-However, in real-world operations:
+* Weekly demand fluctuates
+* Lead times vary
+* Shipment delays occur
 
-* Weekly product demand fluctuates
-* Supplier lead times vary
-* Shipment schedules shift due to logistics constraints
-
-This creates a mismatch between:
-
-> Inventory planning assumptions
-> and
-> Actual operational variability
-
-As a result:
-
-* Reorder points may be triggered too late
-* Safety buffers may remain insufficient
-* Stockout risk may increase
-  even when inventory is available
+This creates a mismatch between planning assumptions and operational variability, increasing stockout risk even when inventory exists.
 
 ---
 
-### Business Objective
+# Business Objective
 
-Evaluate whether the current replenishment policy can:
+Assess whether the existing reorder policy:
 
-> Maintain a 95% service level
+> Maintains 95% service level
 > under demand and lead time variability
-> without significantly increasing inventory holding cost
+> without excessive capital expansion
 
 ---
 
-## Dataset Information
+# Dataset Overview
 
-This project uses the **DataCo Supply Chain Dataset**, which contains transactional-level order and shipment data from a multi-regional retail supply chain system.
+The project uses the **DataCo Supply Chain Dataset**, containing 180K+ transactional order records.
 
 Each row represents:
 
-> A product-level order transaction
+* SKU-level order
+* Quantity purchased
+* Order timestamp
+* Shipping timestamp
+* Product price
 
-Including:
+This structure enables:
 
-* Order placement date
-* Product identifier (SKU)
-* Quantity ordered
-* Scheduled shipment timeline
-* Actual shipping date
-* Unit inventory price
-
----
-
-### Key Variables Used
-
-| Variable            | Description                    |
-| ------------------- | ------------------------------ |
-| product_card_id     | Unique identifier for each SKU |
-| order_item_quantity | Quantity of product ordered    |
-| order_date          | Customer order placement date  |
-| shipping_date       | Shipment dispatch date         |
-| product_price       | Unit inventory price           |
-| shipping_mode       | Shipment method                |
-| delivery_status     | Shipment completion status     |
-
-These fields enable:
-
-* SKU-level demand aggregation
+* Weekly demand aggregation
 * Lead time estimation
-* Inventory policy evaluation
+* Inventory policy modelling
 
 ---
 
-## Analytical Workflow
+# Key Variables Used
+
+| Variable            | Description            |
+| ------------------- | ---------------------- |
+| product_card_id     | SKU identifier         |
+| order_item_quantity | Units ordered          |
+| order_date          | Order placement date   |
+| shipping_date       | Shipment dispatch date |
+| product_price       | Unit inventory cost    |
 
 ---
 
-### 1.) Demand Signal Engineering
+# Analytical Workflow
 
-Transactional order data was aggregated to construct:
+---
+
+## 1️.) Demand Signal Engineering
+
+Raw transactions were aggregated into:
 
 > Weekly SKU-level demand time series
 
-This converts:
-
-* Individual customer transactions
-  into
-* Planning-ready demand signals
-
-required for inventory policy modelling.
+This transforms raw order data into planning-ready demand signals.
 
 ---
 
-### 2️.) Demand Variability Modelling
+## 2️.) Demand Variability Modeling
 
-Weekly demand signals were analyzed to estimate:
+For each SKU:
 
-* Mean demand per SKU
-* Standard deviation of demand
+* Mean weekly demand
+* Standard deviation
 * Coefficient of variation
 
-This quantifies:
-
-> Demand uncertainty
-> across the SKU portfolio
+This quantifies demand uncertainty across the portfolio.
 
 ---
 
-### 3️.) Lead Time Estimation
+## 3️.) Lead Time Estimation
 
-Shipment dispatch timelines were used to calculate:
+Lead time calculated as:
 
-> Actual replenishment lead time
-> between order placement
-> and shipment initiation
+> Shipping Date − Order Date
 
-Lead time variability was estimated at SKU level
-to account for supply-side uncertainty.
+Mean and variability of lead time were computed at SKU level to incorporate supply-side uncertainty.
 
 ---
 
-### 4️.) Inventory Policy Modelling
+## 4️.) Inventory Policy Modeling
 
-Using:
+Safety stock calculated using:
 
 * Demand variability
 * Lead time variability
+* 95% service-level Z-score
 
-Safety stock was computed for each SKU
-to align replenishment policy with a:
+Reorder Point (ROP):
 
-> 95% service-level target
-
-Reorder points were recalibrated using:
-
-ROP = Mean Demand During Lead Time + Safety Stock
+> ROP = Mean Demand During Lead Time + Safety Stock
 
 ---
 
-### 5️.) Policy Simulation
+## 5️.) Policy Gap Assessment
 
-Recalibrated reorder points were compared with:
-
-> Current reorder levels
-
-to identify:
+Current reorder levels were compared against variability-adjusted ROP to compute:
 
 * Reorder gap
 * Under-buffered SKUs
-* Inventory policy inadequacy
+* Policy inadequacy
 
 ---
 
-### 6️.) Financial Impact Assessment
+## 6️.) Financial Impact Assessment
 
-Additional safety buffer required
-for policy correction was converted into:
+Additional safety stock required was converted into:
 
 > Incremental working capital investment
 
-based on SKU-level inventory price.
+Total capital required to achieve 95% service target:
 
-This quantifies:
-
-> Capital required to align
-> replenishment policy
-> with operational variability
+> **$185,900**
 
 ---
 
-## Dashboard Overview
+# Dashboard Overview
 
 ![Dashboard Overview](https://github.com/Neelaksh-Lohani/Inventory_Reorder_Policy_Optimization/raw/main/Project_Relevant_Photos/Dashboard.png)
 
 The Power BI dashboard provides:
 
-* Reorder gap between current
-  and variability-adjusted reorder levels
-* SKU-level exposure to stockout risk
+* SKU-level reorder gap
 * Demand volatility segmentation
-* Lead time variability segmentation
-* Additional safety buffer required
-* Working capital required
-  for policy correction
+* Lead time segmentation
+* Capital impact by SKU
+* Portfolio risk concentration
 
 ---
 
-## Data Model
+# Data Model
 
 ![Data Model](https://github.com/Neelaksh-Lohani/Inventory_Reorder_Policy_Optimization/raw/main/Project_Relevant_Photos/Data_Model.png)
 
-The analytical model integrates:
+The model integrates:
 
-* Demand variability
-* Lead time variability
-* Inventory policy parameters
-  to assess SKU-level replenishment adequacy.
+* Demand uncertainty
+* Lead time uncertainty
+* Inventory cost parameters
 
----
-
-## Key Insights & Recommendations
+to evaluate replenishment adequacy.
 
 ---
 
-### Insight 1
-
-Current reorder thresholds underestimate demand variability during replenishment lead time across several SKUs.
-
-**Recommendation:**
-Recalibrate reorder points for SKUs exhibiting significant reorder gaps to ensure sufficient inventory availability during demand fluctuations.
+# Key Insights
 
 ---
 
-### Insight 2
+### 1.) 77% of SKUs exhibit demand volatility
 
-Moderate to volatile demand SKUs demonstrate higher exposure to inventory depletion under the current replenishment policy.
-
-**Recommendation:**
-Introduce variability-adjusted safety buffering for demand-volatile SKUs to reduce stockout risk caused by unpredictable weekly demand.
+Volatile SKUs drive majority of service risk under static Min–Max policy.
 
 ---
 
-### Insight 3
+### 2.) Average reorder gap = 10.48 units
 
-Uniform Min–Max replenishment policy does not sufficiently reflect SKU-level variability in demand and lead time.
-
-**Recommendation:**
-Adopt differentiated reorder policies based on SKU-level demand variability to ensure buffering strategies align with underlying uncertainty.
+Current policy systematically underestimates variability-adjusted requirements.
 
 ---
 
-### Insight 4
+### 3.) $185.9K capital required for full 95% alignment
 
-Inventory investment required to align reorder levels with service-level targets varies significantly across SKUs.
-
-**Recommendation:**
-Prioritize policy correction for SKUs with high reorder gaps and manageable capital impact for incremental service improvement.
+Service-level compliance requires measurable capital expansion.
 
 ---
 
-### Insight 5
+### 4.) Capital impact concentrated in high-variability SKUs
 
-Stable demand SKUs contribute disproportionately to working capital requirements when reorder levels are adjusted for uncertainty.
-
-**Recommendation:**
-Evaluate reorder revisions for high-demand stable SKUs with consideration for capital implications.
+Not all SKUs contribute equally to working capital exposure.
 
 ---
 
-### Insight 6
+### 5.) Uniform Min–Max logic insufficient
 
-Certain SKUs require limited buffer additions but incur higher inventory investment due to elevated unit cost.
-
-**Recommendation:**
-Assess SKU-level capital intensity prior to implementing policy adjustments to avoid unnecessary working capital lock-in.
+Demand heterogeneity requires differentiated buffering logic.
 
 ---
 
-### Insight 7
-
-Lead time variability contributes to differences in required safety buffering across SKUs.
-
-**Recommendation:**
-Incorporate supplier lead time variability into replenishment parameter settings for SKUs with unpredictable replenishment cycles.
+# Recommendations
 
 ---
 
-### Insight 8
+### 1️.) Recalibrate ROP for Moderate & Volatile SKUs
 
-Reorder gap magnitude varies across demand-risk segments.
-
-**Recommendation:**
-Apply reorder revisions progressively across SKU segments beginning with those demonstrating higher reorder gaps.
+Adjust reorder thresholds to absorb demand & lead time uncertainty.
 
 ---
 
-## 🛠 Tools & Technologies
+### 2️.) Implement Risk-Based Segmentation
+
+| Segment  | Policy Direction           |
+| -------- | -------------------------- |
+| Stable   | Lean buffer                |
+| Moderate | Adjusted safety stock      |
+| Volatile | Higher buffer / monitoring |
+
+---
+
+### 3️.) Prioritize High-Risk, Moderate-Capital SKUs
+
+Address SKUs with high reorder gaps but manageable capital impact first.
+
+---
+
+### 4️.) Integrate Lead Time Variability into Planning Parameters
+
+Avoid fixed lead-time assumptions in replenishment logic.
+
+---
+
+# Business Outcome
+
+Revising reorder thresholds based on variability:
+
+* Reduces stockout exposure
+* Improves service reliability
+* Enables targeted capital deployment
+* Supports risk-aware replenishment planning
+
+---
+
+# Tools & Technologies
 
 * PostgreSQL
 * Power BI
 * DAX
-* Supply Chain Analytics
+* SQL Aggregations
 
 ---
 
-## Business Outcome
+# What This Project Demonstrates
 
-Revising reorder thresholds
-to account for demand and lead time variability may:
+* Operational inventory planning knowledge
+* Demand & lead time uncertainty modeling
+* Financial impact quantification
+* Policy gap diagnosis
+* Decision-support dashboard design
 
-* Improve inventory availability
-* Reduce likelihood of stockouts
-* Align replenishment policy
-  with SKU-level uncertainty
-* Enable targeted inventory investment
-  across the SKU portfolio
+---
 
-Supporting:
+# Final Assessment
 
-> Risk-aware replenishment planning
-> under operational variability
+This project demonstrates working-level specialization in:
+
+> Inventory Planning & Supply Chain Analytics
+
+without academic over-engineering or unnecessary complexity.
 
 ---
 
